@@ -1,0 +1,48 @@
+id: count_csv_rows_year
+namespace: zoomcamp
+description: Count total rows from CSV files on GitHub for a specific year
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: green
+
+  - id: year
+    type: STRING
+    displayName: Year
+    defaults: "2020"
+
+tasks:
+  - id: count_all_months
+    type: io.kestra.plugin.core.flow.ForEach
+    values:
+      ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    tasks:
+      - id: download_and_count
+        type: io.kestra.plugin.scripts.shell.Commands
+        taskRunner:
+          type: io.kestra.plugin.core.runner.Process
+        commands:
+          - |
+            FILE="{{inputs.taxi}}_tripdata_{{inputs.year}}-{{taskrun.value}}.csv"
+            echo "Processing $FILE"
+
+            # Download and count rows (excluding header)
+            ROWS=$(wget -qO- https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/$FILE.gz | gunzip | tail -n +2 | wc -l)
+
+            echo "{\"file\": \"$FILE\", \"rows\": $ROWS}"
+            echo "$ROWS" > row_count.txt
+        outputFiles:
+          - row_count.txt
+
+  - id: sum_all_counts
+    type: io.kestra.plugin.scripts.shell.Commands
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - |
+        TOTAL=0
+        echo "Summing all row counts..."
+        echo "Total rows for {{inputs.taxi}} taxi in {{inputs.year}}: $TOTAL"
