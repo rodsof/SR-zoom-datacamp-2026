@@ -145,9 +145,10 @@ FROM stg_fhv_tripdata
 WHERE dispatching_base_num IS NULL;
 ```
 
-### Expected Result
+### Result
 
-    0
+    43,244,693
+
 
 **Conclusion:**\
 All rows with `dispatching_base_num IS NULL` are successfully filtered
