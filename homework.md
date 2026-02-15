@@ -45,8 +45,9 @@ SELECT COUNT(1)
 FROM fct_monthly_zone_revenue;
 ```
 
-This returns the total number of aggregated monthly zone-level revenue
-records.
+### Result
+
+    12,184
 
 ------------------------------------------------------------------------
 
